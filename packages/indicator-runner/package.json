@@ -30,9 +30,9 @@
     "@assemblyscript/loader": "^0.28.12"
   },
   "peerDependencies": {
-    "@fxtoolkit/indicator-stdlib": "^0.3.0"
+    "@fxtoolkit/indicator-stdlib": "^0.4.0"
   },
   "devDependencies": {
-    "@fxtoolkit/indicator-stdlib": "^0.3.0"
+    "@fxtoolkit/indicator-stdlib": "^0.4.0"
   }
 }
