@@ -1,6 +1,6 @@
 {
   "name": "@fxtoolkit/indicator-runner",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "WebAssembly indicator runtime and canvas renderer for FX Toolkit hosts.",
@@ -30,9 +30,9 @@
     "@assemblyscript/loader": "^0.28.12"
   },
   "peerDependencies": {
-    "@fxtoolkit/indicator-stdlib": "^0.2.0"
+    "@fxtoolkit/indicator-stdlib": "^0.3.0"
   },
   "devDependencies": {
-    "@fxtoolkit/indicator-stdlib": "^0.2.0"
+    "@fxtoolkit/indicator-stdlib": "^0.3.0"
   }
 }

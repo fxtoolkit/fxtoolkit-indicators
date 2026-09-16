@@ -38,13 +38,8 @@ export function createFrameSceneHost(
     getPlotWidth: () => requireFrame().plotWidth,
     getTimeFrameMs: () => requireFrame().timeFrameMs,
     getVisibleTimeRange: () => requireFrame().visibleTimeRange,
-    xToTime: (x) => {
-      const frame = requireFrame();
-      const logical =
-        frame.timeOrigin +
-        (x - frame.plotOffsetX) / Math.max(frame.pixelsPerBar, 1e-9);
-
-      return frame.logicalToTime(logical);
-    },
+    // The frame owns its own inverse, so this stays correct whether the projection came from a
+    // viewport or from a host-supplied time axis.
+    xToTime: (x) => requireFrame().xToTime(x),
   };
 }

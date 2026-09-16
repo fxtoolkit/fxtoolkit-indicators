@@ -56,18 +56,40 @@ export interface ChartRenderPerformanceSnapshot {
 }
 
 /**
+ * A time axis supplied by a host that owns its own viewport.
+ *
+ * TradingView, for instance, projects over bar *indexes*
+ * (`x = width - (rightOffset + barsFromRight(time) + 1) * barSpacing`), which the built-in
+ * `viewport` model cannot express — without this the overlay cannot line up with the candles.
+ * Supplying it hands the whole time axis to the host; the frame still owns the price scale, the plot
+ * box and the visible extents.
+ */
+export interface TimeAxis {
+  /** Horizontal distance between adjacent bars, in CSS pixels. */
+  pixelsPerBar: number;
+  /** Timestamp to CSS pixel x, in the same space as `plotWidth`. */
+  toX(time: number): number;
+  /** Inverse of `toX`, for pointer to time. */
+  toTime(x: number): number;
+  /** The time range on screen. Also decides which bars count as visible. */
+  visibleTimeRange: {
+    from: number;
+    to: number;
+  };
+}
+
+/**
  * One immutable projection of the current viewport.
  *
  * The field set is exactly what the indicator render path consumes — `indicator-scene-adapter.ts`
  * uses `timeToX`, `valueToY`, `visibleTimeRange`, `timeFrameMs`, `plotWidth`, `pixelsPerBar`,
  * `plotRightX`, `plotHeight`, `visiblePriceRange`, `areTimesAdjacent`, `timeOrigin` and
  * `plotOffsetX`, and the scene compositors key their geometry cache on `dataRevision`.
- * `logicalToTime` is the inverse the adapter's host needs to map pointer x back to time.
+ * `xToTime` is the inverse of `timeToX`.
  */
 export interface ChartRenderFrame {
   areTimesAdjacent(leftTime: number, rightTime: number): boolean;
   dataRevision: number;
-  logicalToTime(logical: number): number;
   pipSize: number;
   pixelsPerBar: number;
   plotHeight: number;
@@ -85,6 +107,7 @@ export interface ChartRenderFrame {
     from: number;
     to: number;
   };
+  xToTime(x: number): number;
   /** Every value scale in play, keyed by scale id. The renderer's cache key reads these. */
   yScales: Map<string, ValueScaleProjection>;
 }

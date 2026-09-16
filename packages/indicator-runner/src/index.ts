@@ -34,6 +34,8 @@ export { getDummyPipSizeForSymbol, getStringFromMeta } from "./utils/market";
 export type {
   ChartPriceRange,
   ChartRenderFrame,
+  ChartRenderPerformanceSnapshot,
+  TimeAxis,
   ValueScaleProjection,
   ValueScaleUnit,
 } from "./model/types";

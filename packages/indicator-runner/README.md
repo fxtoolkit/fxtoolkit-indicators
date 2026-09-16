@@ -51,6 +51,36 @@ are optional: omit them and they are inferred from the bars (symbol from `bar.me
 from the smallest bar gap, pip size from the symbol). Supply them when you already know your
 instrument — inference is a convenience, not a substitute.
 
+## Using your own viewport
+
+If something else draws the candles and owns the viewport — TradingView Charting Library, for
+instance — the built-in `viewport` model cannot express its transform, and the overlay will not line
+up with the candles. Supply the time axis instead:
+
+```ts
+const surface = mountIndicatorSurface(container, {
+  getTimeAxis: () => ({
+    pixelsPerBar: chartApi.getTimeScale().barSpacing(),
+    toX: (time) => /* your projection */,
+    toTime: (x) => /* its inverse */,
+    visibleTimeRange: { from, to },   // ms
+  }),
+});
+```
+
+`getTimeAxis` is called on every render, so it can read live viewport state. Return `null` to fall
+back to the built-in model.
+
+Two consequences:
+
+- **Your `visibleTimeRange` decides which bars are visible**, so the automatic price domain fits your
+  window rather than ours.
+- **Your `toX`/`toTime` are used verbatim**, and must be exact inverses. TradingView's transform is
+  `x = width - (rightOffset + barsFromRight(time) + 1) * barSpacing`, where `barsFromRight` counts bar
+  indexes back from the newest bar.
+
+The frame is otherwise unchanged: it still owns the price scale, the plot box and the visible extents.
+
 ## Rendering backends
 
 `prefer` accepts `"auto"` (default), `"webgl"` or `"canvas"`. You can also construct a backend

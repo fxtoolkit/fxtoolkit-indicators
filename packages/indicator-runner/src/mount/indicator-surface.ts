@@ -16,6 +16,7 @@ import { createChartFrame, type PriceScaleMode } from "../model/frame";
 import type {
   ChartRenderFrame,
   ChartRenderPerformanceSnapshot,
+  TimeAxis,
 } from "../model/types";
 import {
   createViewport,
@@ -47,6 +48,13 @@ export interface IndicatorEnvironmentOptions {
 }
 
 export interface IndicatorSurfaceOptions extends IndicatorEnvironmentOptions {
+  /**
+   * Supplies the time axis each render, for a host that owns its own viewport (see `TimeAxis`).
+   *
+   * Called on every render, so it can read live viewport state from whatever draws the candles.
+   * Return `null` to fall back to the built-in `viewport` model.
+   */
+  getTimeAxis?: () => TimeAxis | null;
   /** Render backend. Defaults to `"auto"` (WebGL, falling back to Canvas2D). */
   prefer?: IndicatorRendererPreference;
   /** Overrides device-pixel-ratio detection. */
@@ -118,6 +126,7 @@ export function mountIndicatorSurface(
       plotWidth: canvas.clientWidth || canvas.width,
       priceScaleMode: options.priceScaleMode,
       symbol: options.symbol,
+      timeAxis: options.getTimeAxis?.() ?? undefined,
       timeFrameMs: options.timeframeMs,
       viewport,
     };
