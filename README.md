@@ -24,8 +24,8 @@ Then consume them by URL. **Install both** — the runner peer-depends on the st
 ```json
 {
   "dependencies": {
-    "@fxtoolkit/indicator-stdlib": "https://github.com/YOU/fxtoolkit-indicators/releases/download/v0.1.0/fxtoolkit-indicator-stdlib-0.1.0.tgz",
-    "@fxtoolkit/indicator-runner": "https://github.com/YOU/fxtoolkit-indicators/releases/download/v0.1.0/fxtoolkit-indicator-runner-0.1.0.tgz"
+    "@fxtoolkit/indicator-stdlib": "https://github.com/YOU/fxtoolkit-indicators/releases/download/v0.2.0/fxtoolkit-indicator-stdlib-0.2.0.tgz",
+    "@fxtoolkit/indicator-runner": "https://github.com/YOU/fxtoolkit-indicators/releases/download/v0.2.0/fxtoolkit-indicator-runner-0.2.0.tgz"
   }
 }
 ```

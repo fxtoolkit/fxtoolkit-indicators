@@ -78,12 +78,29 @@ const result = await compileScriptIsolated(source, { module: "untrusted", timeou
 `compileScriptIsolated` spawns a worker from the package's built output, so it must be installed from
 a tarball or a build — it cannot run from source.
 
+## Compiling in the browser
+
+Same contract, same shared implementation — only the `asc` build differs:
+
+```ts
+// Import lazily. asc + binaryen is ~15 MB and must never reach app startup.
+const { compileScriptInBrowser } = await import("@fxtoolkit/indicator-stdlib/compiler/browser");
+
+const result = await compileScriptInBrowser(source, { module: "my-indicator" });
+```
+
+It produces **byte-identical** output to the Node compiler for the same input (asserted by a test in
+the runner package). It is self-contained: no CDN, no network, no filesystem.
+
+Compilation is CPU-bound and blocks while it runs, so run it in a Web Worker if the host UI must stay
+responsive. Bundle the worker with ESM output — `worker: { format: "es" }` in Vite.
+
 ## Installing
 
 ```json
 {
   "dependencies": {
-    "@fxtoolkit/indicator-stdlib": "https://github.com/YOU/fxtoolkit-indicators/releases/download/v0.1.0/fxtoolkit-indicator-stdlib-0.1.0.tgz"
+    "@fxtoolkit/indicator-stdlib": "https://github.com/YOU/fxtoolkit-indicators/releases/download/v0.2.0/fxtoolkit-indicator-stdlib-0.2.0.tgz"
   }
 }
 ```

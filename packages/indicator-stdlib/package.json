@@ -1,6 +1,6 @@
 {
   "name": "@fxtoolkit/indicator-stdlib",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "description": "AssemblyScript indicator standard library and in-memory script compiler.",
@@ -21,10 +21,14 @@
       "types": "./dist/compiler/index.d.ts",
       "import": "./dist/compiler/index.js"
     },
+    "./compiler/browser": {
+      "types": "./dist/compiler/browser.d.ts",
+      "import": "./dist/compiler/browser.js"
+    },
     "./package.json": "./package.json"
   },
   "scripts": {
-    "build": "node scripts/pack-stdlib.mjs && tsup",
+    "build": "node scripts/pack-stdlib.mjs && tsup && node scripts/build-browser-compiler.mjs",
     "typecheck": "node scripts/pack-stdlib.mjs && tsc -p tsconfig.json"
   },
   "dependencies": {
@@ -39,6 +43,7 @@
     }
   },
   "devDependencies": {
-    "assemblyscript": "^0.28.12"
+    "assemblyscript": "^0.28.12",
+    "esbuild": "^0.25.0"
   }
 }
