@@ -28,6 +28,12 @@ import {
   type IndicatorRendererBackend,
   type IndicatorRendererPreference,
 } from "../render/create-renderer";
+import {
+  getDummyPipSizeForSymbol,
+  getSeriesVolatility,
+  getStringFromMeta,
+  inferTimeFrameMs,
+} from "../utils/market";
 import RenderScheduler from "./render-scheduler";
 import {
   defaultFrameScheduler,
@@ -67,6 +73,12 @@ export interface IndicatorProjection {
   priceRange?: ChartPriceRange | null;
   /** Timestamps to x, in the same plot box. */
   timeAxis: TimeAxis;
+}
+
+/** Per-series values resolved once per render and shared by every frame it builds. */
+interface SeriesMetrics {
+  pipSize: number;
+  timeFrameMs: number;
 }
 
 export interface IndicatorSurfaceOptions extends IndicatorEnvironmentOptions {
@@ -152,20 +164,43 @@ export function mountIndicatorSurface(
 
   renderer.setBundles(bundles);
 
-  function baseFrameOptions(projection: IndicatorProjection | null) {
+  function baseFrameOptions(
+    projection: IndicatorProjection | null,
+    metrics: SeriesMetrics,
+  ) {
     return {
       bars,
       dataRevision,
       freePriceRange: projection?.priceRange ?? undefined,
-      pipSize: options.pipSize,
+      pipSize: metrics.pipSize,
       plotHeight:
         projection?.plotHeight ?? (canvas.clientHeight || canvas.height),
       plotWidth: projection?.plotWidth ?? (canvas.clientWidth || canvas.width),
       priceScaleMode: projection?.priceRange ? "free" : options.priceScaleMode,
       symbol: options.symbol,
       timeAxis: projection?.timeAxis,
-      timeFrameMs: options.timeframeMs,
+      timeFrameMs: metrics.timeFrameMs,
       viewport,
+    };
+  }
+
+  /**
+   * The pip size and bar interval, derived once per render.
+   *
+   * Both are inferred by scanning every bar, and a render builds the frame twice — once to resolve
+   * the indicator's own price extents and once for real — so resolving them here instead of leaving
+   * it to `createChartFrame` halves that work. Explicit `IndicatorEnvironmentOptions` still win.
+   */
+  function deriveSeriesMetrics(): SeriesMetrics {
+    return {
+      pipSize: options.pipSize ??
+        getDummyPipSizeForSymbol(
+          options.symbol
+            ?? getStringFromMeta(bars[0]?.meta, "symbol")
+            ?? "ETHUSD",
+          getSeriesVolatility(bars),
+        ),
+      timeFrameMs: options.timeframeMs ?? inferTimeFrameMs(bars),
     };
   }
 
@@ -175,11 +210,12 @@ export function mountIndicatorSurface(
     }
 
     const projection = options.getProjection?.() ?? null;
+    const metrics = deriveSeriesMetrics();
 
     // A host-supplied price domain is authoritative: its scale already covers whatever the host
     // draws, and a free range wins over extents anyway, so there is nothing to fold in.
     if (projection?.priceRange) {
-      currentFrame = createChartFrame(baseFrameOptions(projection));
+      currentFrame = createChartFrame(baseFrameOptions(projection, metrics));
       renderer.render(currentFrame);
 
       return;
@@ -191,12 +227,12 @@ export function mountIndicatorSurface(
     // Extents depend only on the viewport (visible time range and plot size), never on the price
     // domain, so a provisional frame is enough to resolve them — and the adapter's extents cache is
     // keyed on the viewport, so the second pass reuses it rather than recomputing.
-    const provisional = createChartFrame(baseFrameOptions(projection));
+    const provisional = createChartFrame(baseFrameOptions(projection, metrics));
     const extents = renderer.getVisiblePriceExtents(provisional);
 
     currentFrame = extents
       ? createChartFrame({
-          ...baseFrameOptions(projection),
+          ...baseFrameOptions(projection, metrics),
           additionalPriceValues: [extents.low, extents.high],
         })
       : provisional;

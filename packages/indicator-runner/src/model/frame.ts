@@ -75,12 +75,13 @@ export function createChartFrame(
   const hostAxis = options.timeAxis;
 
   // A host that owns the viewport also decides what is on screen, so the visible bars follow its
-  // range rather than our viewport window.
+  // range rather than our viewport window. The series is time-ordered, so the window is a pair of
+  // bounds instead of a scan over every bar — this runs twice per rendered frame.
   const visibleBars = hostAxis
-    ? options.bars.filter(
-        (bar) =>
-          bar.time >= hostAxis.visibleTimeRange.from &&
-          bar.time <= hostAxis.visibleTimeRange.to,
+    ? sliceBarsInRange(
+        options.bars,
+        hostAxis.visibleTimeRange.from,
+        hostAxis.visibleTimeRange.to,
       )
     : resolveVisibleWindow(options.bars, viewport).bars;
 
@@ -88,12 +89,15 @@ export function createChartFrame(
     inferTimeFrameMs(options.bars);
   const timeScaleMode = options.timeScaleMode ?? "continuous";
   // Built from every bar, not just the visible ones, so panning and zooming never move the
-  // logical positions of bars that stay on screen. Unused when the host supplies an axis.
-  const logicalTimeScale = createLogicalTimeScale({
-    mode: timeScaleMode,
-    timeFrameMs,
-    times: options.bars.map((bar) => bar.time),
-  });
+  // logical positions of bars that stay on screen. Unused when the host supplies an axis — and it
+  // sorts every timestamp in the series, so in that case it is deliberately not built at all.
+  const logicalTimeScale = hostAxis
+    ? null
+    : createLogicalTimeScale({
+        mode: timeScaleMode,
+        timeFrameMs,
+        times: options.bars.map((bar) => bar.time),
+      });
 
   const pipSize = options.pipSize ??
     getDummyPipSizeForSymbol(
@@ -137,21 +141,21 @@ export function createChartFrame(
   // geometry cache key and changes whenever the host pans or zooms.
   const timeOrigin = hostAxis
     ? hostAxis.toTime(plotOffsetX)
-    : logicalTimeScale.timeToLogical(visibleTimeRange.from);
+    : logicalTimeScale!.timeToLogical(visibleTimeRange.from);
 
   const timeToX = hostAxis
     ? hostAxis.toX
     : (time: number) =>
         plotOffsetX +
-        pixelsPerBar * (logicalTimeScale.timeToLogical(time) - timeOrigin);
+        pixelsPerBar * (logicalTimeScale!.timeToLogical(time) - timeOrigin);
 
   return {
     areTimesAdjacent: hostAxis
       ? (leftTime, rightTime) => Math.abs(rightTime - leftTime) <= 1.5 * timeFrameMs
       : (leftTime, rightTime) =>
           Math.abs(
-            logicalTimeScale.timeToLogical(rightTime) -
-              logicalTimeScale.timeToLogical(leftTime),
+            logicalTimeScale!.timeToLogical(rightTime) -
+              logicalTimeScale!.timeToLogical(leftTime),
           ) <= 1.5,
     dataRevision: options.dataRevision ?? 0,
     pipSize,
@@ -170,7 +174,7 @@ export function createChartFrame(
     xToTime: hostAxis
       ? hostAxis.toTime
       : (x: number) =>
-          logicalTimeScale.logicalToTime(
+          logicalTimeScale!.logicalToTime(
             timeOrigin + (x - plotOffsetX) / Math.max(pixelsPerBar, 1e-9),
           ),
     yScales,
@@ -193,6 +197,57 @@ function createScale(
         quantization,
         unit: "price",
       });
+}
+
+/**
+ * The bars inside `[fromTime, toTime]`, by binary search.
+ *
+ * The series is required to be time-ordered everywhere else in this module, so the window needs a
+ * pair of bounds rather than a scan over the whole history.
+ */
+function sliceBarsInRange(
+  bars: readonly ChartBar[],
+  fromTime: number,
+  toTime: number,
+): ChartBar[] {
+  return bars.slice(
+    lowerBoundBarTime(bars, fromTime),
+    upperBoundBarTime(bars, toTime),
+  );
+}
+
+function lowerBoundBarTime(bars: readonly ChartBar[], time: number): number {
+  let low = 0;
+  let high = bars.length;
+
+  while (low < high) {
+    const middle = (low + high) >> 1;
+
+    if (bars[middle].time < time) {
+      low = middle + 1;
+    } else {
+      high = middle;
+    }
+  }
+
+  return low;
+}
+
+function upperBoundBarTime(bars: readonly ChartBar[], time: number): number {
+  let low = 0;
+  let high = bars.length;
+
+  while (low < high) {
+    const middle = (low + high) >> 1;
+
+    if (bars[middle].time <= time) {
+      low = middle + 1;
+    } else {
+      high = middle;
+    }
+  }
+
+  return low;
 }
 
 function resolvePriceRange(
