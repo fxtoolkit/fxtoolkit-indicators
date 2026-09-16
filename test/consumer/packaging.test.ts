@@ -41,8 +41,15 @@ describe("packaging", () => {
     expect(Object.keys(stdlibManifest.exports).sort()).toEqual([
       "./abi",
       "./compiler",
+      "./compiler/browser",
       "./package.json",
     ]);
+
+    // The browser compiler is a distinct artifact that must not be pulled in by the barrel.
+    expect(
+      existsSync(resolve(STDLIB_ROOT, "dist/compiler/browser.js")),
+      "browser compiler artifact",
+    ).toBe(true);
 
     for (const [subpath, target] of Object.entries(runnerManifest.exports)) {
       if (subpath === "./package.json") continue;
