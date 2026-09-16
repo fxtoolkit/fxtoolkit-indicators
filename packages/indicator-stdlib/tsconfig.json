@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "paths": {
+      "@fxtoolkit/indicator-stdlib/abi": ["./abi/index.ts"],
+      "@fxtoolkit/indicator-stdlib/compiler": ["./compiler/index.ts"]
+    }
+  },
+  "include": ["abi/**/*.ts", "compiler/**/*.ts", "test/**/*.ts"],
+  "exclude": ["index.ts", "dist", "node_modules"]
+}

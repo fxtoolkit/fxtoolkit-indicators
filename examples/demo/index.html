@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FX Toolkit indicators — runner demo</title>
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      body {
+        background: #0f1115;
+        color: #e6e8eb;
+        font: 13px/1.5 ui-sans-serif, system-ui, sans-serif;
+        margin: 0;
+        padding: 16px;
+      }
+      h1 {
+        font-size: 15px;
+        font-weight: 600;
+        margin: 0 0 12px;
+      }
+      .toolbar {
+        align-items: center;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 12px;
+      }
+      .toolbar label {
+        color: #9aa4b2;
+      }
+      select,
+      button {
+        background: #1b1f27;
+        border: 1px solid #2b313c;
+        border-radius: 6px;
+        color: inherit;
+        font: inherit;
+        padding: 4px 8px;
+      }
+      button {
+        cursor: pointer;
+      }
+      button:hover {
+        border-color: #3d4653;
+      }
+      #surface {
+        background: #14181f;
+        border: 1px solid #232a34;
+        border-radius: 8px;
+        height: 60vh;
+        min-height: 320px;
+        overflow: hidden;
+        position: relative;
+      }
+      #host-canvas {
+        display: block;
+        height: 100%;
+        width: 100%;
+      }
+      .status {
+        color: #9aa4b2;
+        font-family: ui-monospace, monospace;
+        font-size: 12px;
+        margin-top: 10px;
+        white-space: pre-wrap;
+      }
+      .error {
+        color: #ff6b6b;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>FX Toolkit indicators — runner demo</h1>
+
+    <div class="toolbar">
+      <label for="indicator">Indicator</label>
+      <select id="indicator"></select>
+
+      <label for="backend">Backend</label>
+      <select id="backend">
+        <option value="auto">auto (WebGL, fallback Canvas2D)</option>
+        <option value="webgl">WebGL</option>
+        <option value="canvas">Canvas2D</option>
+      </select>
+
+      <label for="host">Target</label>
+      <select id="host">
+        <option value="container">container (we create the canvas)</option>
+        <option value="canvas">host canvas</option>
+      </select>
+
+      <button id="zoom-in">Zoom in</button>
+      <button id="zoom-out">Zoom out</button>
+      <button id="pan-left">&larr; Pan</button>
+      <button id="pan-right">Pan &rarr;</button>
+    </div>
+
+    <div id="surface"></div>
+    <div class="status" id="status">Loading…</div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

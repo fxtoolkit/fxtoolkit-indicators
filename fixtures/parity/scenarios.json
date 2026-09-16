@@ -1,0 +1,379 @@
+{
+  "barsSource": "fixtures/golden/bar-batch.json",
+  "scenarios": [
+    {
+      "barCount": 300,
+      "id": "htf-confluence__default-history",
+      "module": "htf-confluence",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "htf-confluence__truncated-history",
+      "module": "htf-confluence",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 60,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "htf-confluence__custom-params",
+      "module": "htf-confluence",
+      "params": {
+        "confluenceType": "QMR",
+        "riskReward": 4,
+        "showHtfLevels": false
+      },
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "htf-confluence__realtime",
+      "module": "htf-confluence",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        },
+        {
+          "bar": {
+            "close": 2125.118112304687,
+            "high": 2127.241107421875,
+            "low": 2120.8721220703123,
+            "open": 2122.9951171875,
+            "spread": 0,
+            "time": 1775005200000,
+            "volume": 68044
+          },
+          "kind": "realtime"
+        },
+        {
+          "bar": {
+            "close": 2125.118112304687,
+            "high": 2127.241107421875,
+            "low": 2120.8721220703123,
+            "open": 2122.9951171875,
+            "spread": 0,
+            "time": 1775008800000,
+            "volume": 68044
+          },
+          "kind": "realtime",
+          "commit": true
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "lumina-trend-channels__default-history",
+      "module": "lumina-trend-channels",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "lumina-trend-channels__truncated-history",
+      "module": "lumina-trend-channels",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 60,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "lumina-trend-channels__custom-params",
+      "module": "lumina-trend-channels",
+      "params": {
+        "length": 9,
+        "outerMultiplier": 3.5,
+        "showDashboard": false
+      },
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "lumina-trend-channels__realtime",
+      "module": "lumina-trend-channels",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        },
+        {
+          "bar": {
+            "close": 2125.118112304687,
+            "high": 2127.241107421875,
+            "low": 2120.8721220703123,
+            "open": 2122.9951171875,
+            "spread": 0,
+            "time": 1775005200000,
+            "volume": 68044
+          },
+          "kind": "realtime"
+        },
+        {
+          "bar": {
+            "close": 2125.118112304687,
+            "high": 2127.241107421875,
+            "low": 2120.8721220703123,
+            "open": 2122.9951171875,
+            "spread": 0,
+            "time": 1775008800000,
+            "volume": 68044
+          },
+          "kind": "realtime",
+          "commit": true
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "qmra-indicator__default-history",
+      "module": "qmra-indicator",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "qmra-indicator__truncated-history",
+      "module": "qmra-indicator",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 60,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "qmra-indicator__custom-params",
+      "module": "qmra-indicator",
+      "params": {
+        "swingStrength": 3
+      },
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "qmra-indicator__realtime",
+      "module": "qmra-indicator",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        },
+        {
+          "bar": {
+            "close": 2125.118112304687,
+            "high": 2127.241107421875,
+            "low": 2120.8721220703123,
+            "open": 2122.9951171875,
+            "spread": 0,
+            "time": 1775005200000,
+            "volume": 68044
+          },
+          "kind": "realtime"
+        },
+        {
+          "bar": {
+            "close": 2125.118112304687,
+            "high": 2127.241107421875,
+            "low": 2120.8721220703123,
+            "open": 2122.9951171875,
+            "spread": 0,
+            "time": 1775008800000,
+            "volume": 68044
+          },
+          "kind": "realtime",
+          "commit": true
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "reverse-logic-scalper__default-history",
+      "module": "reverse-logic-scalper",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "reverse-logic-scalper__truncated-history",
+      "module": "reverse-logic-scalper",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 60,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "reverse-logic-scalper__custom-params",
+      "module": "reverse-logic-scalper",
+      "params": {
+        "bbLength": 10,
+        "minScore": 1,
+        "maType": "WMA"
+      },
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        }
+      ]
+    },
+    {
+      "barCount": 300,
+      "id": "reverse-logic-scalper__realtime",
+      "module": "reverse-logic-scalper",
+      "runtimeInfo": {
+        "pipSize": 0.01,
+        "symbol": "ETHUSD",
+        "timeframeMs": 86400000
+      },
+      "steps": [
+        {
+          "barCount": 300,
+          "kind": "history"
+        },
+        {
+          "bar": {
+            "close": 2125.118112304687,
+            "high": 2127.241107421875,
+            "low": 2120.8721220703123,
+            "open": 2122.9951171875,
+            "spread": 0,
+            "time": 1775005200000,
+            "volume": 68044
+          },
+          "kind": "realtime"
+        },
+        {
+          "bar": {
+            "close": 2125.118112304687,
+            "high": 2127.241107421875,
+            "low": 2120.8721220703123,
+            "open": 2122.9951171875,
+            "spread": 0,
+            "time": 1775008800000,
+            "volume": 68044
+          },
+          "kind": "realtime",
+          "commit": true
+        }
+      ]
+    }
+  ]
+}

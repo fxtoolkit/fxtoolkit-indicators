@@ -1,0 +1,469 @@
+{
+  "indicators": [
+    {
+      "abiVersion": 4,
+      "diagnostics": [],
+      "descriptor": {
+        "module": "htf-confluence",
+        "title": "HTF Confluence Signal",
+        "version": "1.0.0",
+        "description": "Triggers on wick sweeps of HTF Peaks/Valleys confirmed by LTF actions (BOS/QMR/iFVG).",
+        "inputs": [
+          {
+            "key": "higherTimeframeMinutes",
+            "label": "Higher TF (Minutes)",
+            "type": "integer",
+            "defaultValue": 60,
+            "min": 5,
+            "max": 1440,
+            "step": 5
+          },
+          {
+            "key": "htfSwingStrength",
+            "label": "HTF Swing Strength",
+            "type": "integer",
+            "defaultValue": 5,
+            "min": 1,
+            "max": 20,
+            "step": 1
+          },
+          {
+            "key": "maxLevels",
+            "label": "Max Levels",
+            "type": "integer",
+            "defaultValue": 60,
+            "min": 1,
+            "max": 200,
+            "step": 1
+          },
+          {
+            "key": "confluenceType",
+            "label": "LTF Confluence Type",
+            "type": "select",
+            "defaultValue": "ANY",
+            "choices": [
+              {
+                "label": "Break of Structure",
+                "value": "BOS"
+              },
+              {
+                "label": "Quasimodo",
+                "value": "QMR"
+              },
+              {
+                "label": "Inverse FVG",
+                "value": "iFVG"
+              },
+              {
+                "label": "Any (BOS/QMR/iFVG)",
+                "value": "ANY"
+              }
+            ]
+          },
+          {
+            "key": "ltfSwingStrength",
+            "label": "LTF Swing Strength",
+            "type": "integer",
+            "defaultValue": 5,
+            "min": 2,
+            "max": 10,
+            "step": 1
+          },
+          {
+            "key": "expirationBars",
+            "label": "Max LTF Bars to Wait",
+            "type": "integer",
+            "defaultValue": 20,
+            "min": 5,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "key": "riskReward",
+            "label": "Risk/Reward Ratio",
+            "type": "number",
+            "defaultValue": 2,
+            "min": 0.5,
+            "max": 10,
+            "step": 0.5
+          },
+          {
+            "key": "showHtfLevels",
+            "label": "Show HTF Levels",
+            "type": "boolean",
+            "defaultValue": true
+          },
+          {
+            "key": "bullishColor",
+            "label": "Bullish Signal Color",
+            "type": "color",
+            "defaultValue": "#00E676"
+          },
+          {
+            "key": "bearishColor",
+            "label": "Bearish Signal Color",
+            "type": "color",
+            "defaultValue": "#FF5252"
+          },
+          {
+            "key": "lineWidth",
+            "label": "Level Line Width",
+            "type": "number",
+            "defaultValue": 1,
+            "min": 1,
+            "max": 4,
+            "step": 1
+          },
+          {
+            "key": "arrowSize",
+            "label": "Arrow Size",
+            "type": "number",
+            "defaultValue": 14,
+            "min": 8,
+            "max": 32,
+            "step": 1
+          }
+        ],
+        "outputKinds": [
+          "ray",
+          "plotshape",
+          "label",
+          "signal"
+        ]
+      },
+      "generatedSourcePath": "src/library/models/chart/indicators/assemblyscript/htf-confluence.ts",
+      "module": "htf-confluence",
+      "sourceLanguage": "assemblyscript",
+      "wasmUrl": "/orion-indicators/htf-confluence.wasm"
+    },
+    {
+      "abiVersion": 4,
+      "diagnostics": [],
+      "descriptor": {
+        "module": "lumina-trend-channels",
+        "title": "Lumina Trend Channels",
+        "version": "1.0.0",
+        "description": "EMA + ATR trend channels with dynamic color, fills, and crossover signals.",
+        "inputs": [
+          {
+            "key": "length",
+            "label": "Channel Length",
+            "type": "integer",
+            "defaultValue": 21,
+            "min": 5,
+            "max": 200,
+            "step": 1
+          },
+          {
+            "key": "outerMultiplier",
+            "label": "Outer Band Multiplier",
+            "type": "number",
+            "defaultValue": 2,
+            "min": 0.5,
+            "max": 10,
+            "step": 0.1
+          },
+          {
+            "key": "innerMultiplier",
+            "label": "Inner Band Multiplier",
+            "type": "number",
+            "defaultValue": 1,
+            "min": 0.2,
+            "max": 10,
+            "step": 0.1
+          },
+          {
+            "key": "bullishColor",
+            "label": "Bullish Color",
+            "type": "color",
+            "defaultValue": "#00E676"
+          },
+          {
+            "key": "bearishColor",
+            "label": "Bearish Color",
+            "type": "color",
+            "defaultValue": "#FF5252"
+          },
+          {
+            "key": "showDashboard",
+            "label": "Show Dashboard",
+            "type": "boolean",
+            "defaultValue": true
+          }
+        ],
+        "outputKinds": [
+          "plot",
+          "fill",
+          "plotshape",
+          "panel",
+          "signal"
+        ]
+      },
+      "generatedSourcePath": "src/library/models/chart/indicators/assemblyscript/lumina-trend-channels.ts",
+      "module": "lumina-trend-channels",
+      "sourceLanguage": "assemblyscript",
+      "wasmUrl": "/orion-indicators/lumina-trend-channels.wasm"
+    },
+    {
+      "abiVersion": 4,
+      "diagnostics": [],
+      "descriptor": {
+        "module": "qmra-indicator",
+        "title": "Advanced Quasimodo",
+        "version": "1.0.0",
+        "description": "Detects active and ignored Quasimodo patterns with zigzag structure and left-shoulder projections.",
+        "inputs": [
+          {
+            "key": "swingStrength",
+            "label": "Swing Strength",
+            "type": "integer",
+            "defaultValue": 5,
+            "min": 2,
+            "max": 12,
+            "step": 1
+          },
+          {
+            "key": "lineWidth",
+            "label": "Line Width",
+            "type": "number",
+            "defaultValue": 1,
+            "min": 1,
+            "max": 4,
+            "step": 0.5
+          },
+          {
+            "key": "bullishColor",
+            "label": "Bullish Color",
+            "type": "color",
+            "defaultValue": "#00ffff"
+          },
+          {
+            "key": "bearishColor",
+            "label": "Bearish Color",
+            "type": "color",
+            "defaultValue": "#ff00ff"
+          },
+          {
+            "key": "ignoredColor",
+            "label": "Ignored Pattern Color",
+            "type": "color",
+            "defaultValue": "#ffa500"
+          }
+        ],
+        "outputKinds": [
+          "line",
+          "ray",
+          "label"
+        ]
+      },
+      "generatedSourcePath": "src/library/models/chart/indicators/assemblyscript/qmra-indicator.ts",
+      "module": "qmra-indicator",
+      "sourceLanguage": "assemblyscript",
+      "wasmUrl": "/orion-indicators/qmra-indicator.wasm"
+    },
+    {
+      "abiVersion": 4,
+      "diagnostics": [],
+      "descriptor": {
+        "module": "reverse-logic-scalper",
+        "title": "Reverse Logic Scalper",
+        "version": "1.0.0",
+        "description": "Contrarian scalper signals using support/resistance, Bollinger breakouts, moving-average crosses, volume, and ATR filters.",
+        "inputs": [
+          {
+            "key": "srLookback",
+            "label": "S/R Lookback",
+            "type": "integer",
+            "defaultValue": 20,
+            "min": 5,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "key": "srTolerancePct",
+            "label": "S/R Tolerance %",
+            "type": "number",
+            "defaultValue": 0.3,
+            "min": 0.1,
+            "max": 1,
+            "step": 0.1
+          },
+          {
+            "key": "bbLength",
+            "label": "BB Length",
+            "type": "integer",
+            "defaultValue": 20,
+            "min": 5,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "key": "bbMultiplier",
+            "label": "BB Multiplier",
+            "type": "number",
+            "defaultValue": 2,
+            "min": 1,
+            "max": 4,
+            "step": 0.1
+          },
+          {
+            "key": "fastMaLength",
+            "label": "Fast MA",
+            "type": "integer",
+            "defaultValue": 9,
+            "min": 3,
+            "max": 100,
+            "step": 1
+          },
+          {
+            "key": "slowMaLength",
+            "label": "Slow MA",
+            "type": "integer",
+            "defaultValue": 21,
+            "min": 5,
+            "max": 200,
+            "step": 1
+          },
+          {
+            "key": "maType",
+            "label": "MA Type",
+            "type": "select",
+            "defaultValue": "EMA",
+            "choices": [
+              {
+                "label": "EMA",
+                "value": "EMA"
+              },
+              {
+                "label": "SMA",
+                "value": "SMA"
+              },
+              {
+                "label": "WMA",
+                "value": "WMA"
+              }
+            ]
+          },
+          {
+            "key": "minScore",
+            "label": "Minimum Score",
+            "type": "integer",
+            "defaultValue": 2,
+            "min": 1,
+            "max": 3,
+            "step": 1
+          },
+          {
+            "key": "useVolumeFilter",
+            "label": "Use Volume Filter",
+            "type": "boolean",
+            "defaultValue": true
+          },
+          {
+            "key": "volumeMultiplier",
+            "label": "Volume Multiplier",
+            "type": "number",
+            "defaultValue": 1.2,
+            "min": 0.5,
+            "max": 3,
+            "step": 0.1
+          },
+          {
+            "key": "useAtrFilter",
+            "label": "Use ATR Filter",
+            "type": "boolean",
+            "defaultValue": true
+          },
+          {
+            "key": "atrMinMultiplier",
+            "label": "ATR Min Multiplier",
+            "type": "number",
+            "defaultValue": 0.5,
+            "min": 0.1,
+            "max": 2,
+            "step": 0.1
+          },
+          {
+            "key": "minBarsBetweenSignals",
+            "label": "Signal Cooldown Bars",
+            "type": "integer",
+            "defaultValue": 3,
+            "min": 1,
+            "max": 50,
+            "step": 1
+          },
+          {
+            "key": "riskReward",
+            "label": "Risk / Reward",
+            "type": "number",
+            "defaultValue": 2,
+            "min": 0.5,
+            "max": 5,
+            "step": 0.1
+          },
+          {
+            "key": "atrStopMultiplier",
+            "label": "ATR Stop Multiplier",
+            "type": "number",
+            "defaultValue": 1.5,
+            "min": 0.5,
+            "max": 5,
+            "step": 0.1
+          },
+          {
+            "key": "bullishColor",
+            "label": "Bullish Color",
+            "type": "color",
+            "defaultValue": "#00E676"
+          },
+          {
+            "key": "bearishColor",
+            "label": "Bearish Color",
+            "type": "color",
+            "defaultValue": "#FF5252"
+          },
+          {
+            "key": "supportColor",
+            "label": "Support Color",
+            "type": "color",
+            "defaultValue": "#22C55E"
+          },
+          {
+            "key": "resistanceColor",
+            "label": "Resistance Color",
+            "type": "color",
+            "defaultValue": "#EF4444"
+          },
+          {
+            "key": "showBollingerBands",
+            "label": "Show Bollinger Bands",
+            "type": "boolean",
+            "defaultValue": true
+          },
+          {
+            "key": "showMovingAverages",
+            "label": "Show Moving Averages",
+            "type": "boolean",
+            "defaultValue": true
+          },
+          {
+            "key": "showSupportResistance",
+            "label": "Show Support / Resistance",
+            "type": "boolean",
+            "defaultValue": true
+          }
+        ],
+        "outputKinds": [
+          "plot",
+          "fill",
+          "plotshape",
+          "signal"
+        ]
+      },
+      "generatedSourcePath": "src/library/models/chart/indicators/assemblyscript/reverse-logic-scalper.ts",
+      "module": "reverse-logic-scalper",
+      "sourceLanguage": "assemblyscript",
+      "wasmUrl": "/orion-indicators/reverse-logic-scalper.wasm"
+    }
+  ]
+}

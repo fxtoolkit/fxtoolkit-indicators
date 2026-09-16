@@ -1,0 +1,33 @@
+{
+  "name": "fxtoolkit-indicators",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "WebAssembly indicator standard library, compiler, and runner for FX Toolkit hosts.",
+  "workspaces": [
+    "packages/*",
+    "examples/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "build:fixtures": "node scripts/build-fixtures.mjs",
+    "build:parity-scenarios": "node scripts/build-parity-scenarios.mjs",
+    "build:stdlib-source": "node packages/indicator-stdlib/scripts/pack-stdlib.mjs",
+    "build:packages": "npm run build -w @fxtoolkit/indicator-stdlib -w @fxtoolkit/indicator-runner",
+    "release": "node scripts/pack-release.mjs",
+    "typecheck": "npm run build:stdlib-source && npm run typecheck --workspaces --if-present",
+    "test": "npm run build:fixtures && npm run build:packages && vitest run && npm run test:consumer",
+    "test:consumer": "vitest run --config vitest.consumer.config.ts",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^22.9.1",
+    "jsdom": "^25.0.1",
+    "tsup": "^8.3.5",
+    "typescript": "~5.6.2",
+    "vitest": "^2.1.9"
+  }
+}

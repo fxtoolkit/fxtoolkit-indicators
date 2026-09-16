@@ -1,0 +1,38 @@
+{
+  "name": "@fxtoolkit/indicator-runner",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "WebAssembly indicator runtime and canvas renderer for FX Toolkit hosts.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./engine/worker": {
+      "types": "./dist/engine/worker.d.ts",
+      "import": "./dist/engine/worker.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@assemblyscript/loader": "^0.28.12"
+  },
+  "peerDependencies": {
+    "@fxtoolkit/indicator-stdlib": "^0.1.0"
+  },
+  "devDependencies": {
+    "@fxtoolkit/indicator-stdlib": "^0.1.0"
+  }
+}
