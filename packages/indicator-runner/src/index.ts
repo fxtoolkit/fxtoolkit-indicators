@@ -47,6 +47,8 @@ export {
   type TimeScaleMode,
 } from "./model/time-scale";
 
+export type { IndicatorProjection } from "./mount/indicator-surface";
+
 export {
   createLinearValueScaleProjection,
   createLogarithmicValueScaleProjection,

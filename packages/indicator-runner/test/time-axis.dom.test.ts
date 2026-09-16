@@ -4,6 +4,7 @@ import {
   createChartFrame,
   createViewport,
   mountIndicatorSurface,
+  type IndicatorProjection,
   type TimeAxis,
 } from "@fxtoolkit/indicator-runner";
 import { installCanvasContextStub } from "./support/fake-canvas";
@@ -206,7 +207,11 @@ describe("surface with a host time axis", () => {
     });
 
     const surface = mountIndicatorSurface(container, {
-      getTimeAxis: () => axis,
+      getProjection: () => ({
+        plotHeight: PLOT_HEIGHT,
+        plotWidth: PLOT_WIDTH,
+        timeAxis: axis,
+      }),
       prefer: "canvas",
     });
 
@@ -234,7 +239,7 @@ describe("surface with a host time axis", () => {
     document.body.appendChild(canvas);
 
     const surface = mountIndicatorSurface(canvas, {
-      getTimeAxis: () => null,
+      getProjection: () => null,
       prefer: "canvas",
       viewport: { barCount: 80 },
     });
@@ -245,6 +250,109 @@ describe("surface with a host time axis", () => {
 
       expect(surface.getFrame()!.pixelsPerBar).toBeCloseTo(PLOT_WIDTH / 80, 9);
       expect(surface.getFrame()!.visibleTimeRange.to).toBe(NEWEST);
+    } finally {
+      surface.destroy();
+    }
+  });
+});
+
+describe("host projection", () => {
+  const bars = makeBars(50);
+  const priceRange = { from: 1000, to: 1100 };
+
+  /** A trivial axis — these tests are about the plot box and the price domain. */
+  function projection(): IndicatorProjection {
+    return {
+      plotHeight: PLOT_HEIGHT,
+      plotWidth: PLOT_WIDTH,
+      priceRange,
+      timeAxis: {
+        pixelsPerBar: 10,
+        toTime: (x: number) => x,
+        toX: (time: number) => time,
+        visibleTimeRange: { from: bars[0].time, to: bars[49].time },
+      },
+    };
+  }
+
+  it("draws to the host's price domain and plot box", () => {
+    installCanvasContextStub();
+
+    const canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+
+    const surface = mountIndicatorSurface(canvas, {
+      getProjection: projection,
+      // Explicit, so the range is not re-snapped around a different pip size.
+      pipSize: 0.01,
+      prefer: "canvas",
+    });
+
+    try {
+      surface.setBars(bars);
+      surface.renderNow();
+
+      const frame = surface.getFrame()!;
+      expect(frame.visiblePriceRange).toEqual(priceRange);
+      expect(frame.plotWidth).toBe(PLOT_WIDTH);
+      expect(frame.plotHeight).toBe(PLOT_HEIGHT);
+      // The host's range spans the box exactly, which is what makes the overlay land on the candle.
+      expect(frame.valueToY(priceRange.to)).toBeCloseTo(0, 6);
+      expect(frame.valueToY(priceRange.from)).toBeCloseTo(PLOT_HEIGHT, 6);
+    } finally {
+      surface.destroy();
+    }
+  });
+
+  it("sizes the canvas from the host's box, not its own client box", () => {
+    installCanvasContextStub();
+
+    const canvas = document.createElement("canvas");
+    // Nothing like the projection's box — the canvas must follow the host, not the DOM.
+    Object.defineProperty(canvas, "clientWidth", { configurable: true, value: 10 });
+    Object.defineProperty(canvas, "clientHeight", { configurable: true, value: 10 });
+    document.body.appendChild(canvas);
+
+    const surface = mountIndicatorSurface(canvas, {
+      getProjection: projection,
+      pixelRatio: 1,
+      prefer: "canvas",
+    });
+
+    try {
+      surface.renderNow();
+
+      expect(canvas.style.width).toBe(`${PLOT_WIDTH}px`);
+      expect(canvas.style.height).toBe(`${PLOT_HEIGHT}px`);
+      expect(canvas.width).toBe(PLOT_WIDTH);
+      expect(canvas.height).toBe(PLOT_HEIGHT);
+    } finally {
+      surface.destroy();
+    }
+  });
+
+  it("still falls back to the canvas box when the projection has no price range", () => {
+    installCanvasContextStub();
+
+    const canvas = document.createElement("canvas");
+    Object.defineProperty(canvas, "clientWidth", { configurable: true, value: PLOT_WIDTH });
+    Object.defineProperty(canvas, "clientHeight", { configurable: true, value: PLOT_HEIGHT });
+    document.body.appendChild(canvas);
+
+    const surface = mountIndicatorSurface(canvas, {
+      getProjection: () => ({ ...projection(), priceRange: null }),
+      prefer: "canvas",
+    });
+
+    try {
+      surface.setBars(bars);
+      surface.renderNow();
+
+      // Automatic scale: fitted to the bars, which reach ~1055, so not the host's range.
+      const frame = surface.getFrame()!;
+      expect(frame.visiblePriceRange.to).not.toBe(priceRange.to);
+      expect(frame.visiblePriceRange.from).toBeLessThan(995);
+      expect(frame.visiblePriceRange.to).toBeGreaterThan(1055);
     } finally {
       surface.destroy();
     }

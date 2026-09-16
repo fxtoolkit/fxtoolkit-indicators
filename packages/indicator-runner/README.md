@@ -51,35 +51,49 @@ are optional: omit them and they are inferred from the bars (symbol from `bar.me
 from the smallest bar gap, pip size from the symbol). Supply them when you already know your
 instrument — inference is a convenience, not a substitute.
 
-## Using your own viewport
+## Using your own viewport and price scale
 
 If something else draws the candles and owns the viewport — TradingView Charting Library, for
 instance — the built-in `viewport` model cannot express its transform, and the overlay will not line
-up with the candles. Supply the time axis instead:
+up with the candles. Supply the projection instead:
 
 ```ts
 const surface = mountIndicatorSurface(container, {
-  getTimeAxis: () => ({
-    pixelsPerBar: chartApi.getTimeScale().barSpacing(),
-    toX: (time) => /* your projection */,
-    toTime: (x) => /* its inverse */,
-    visibleTimeRange: { from, to },   // ms
+  getProjection: () => ({
+    // 1. The box you draw in. The overlay canvas is sized to this, so its pixels are your pixels.
+    plotWidth: paneWidth,
+    plotHeight: paneHeight,
+    // 2. Your time transform.
+    timeAxis: {
+      pixelsPerBar: chartApi.getTimeScale().barSpacing(),
+      toX: (time) => /* your projection */,
+      toTime: (x) => /* its inverse */,
+      visibleTimeRange: { from, to },   // ms
+    },
+    // 3. Your price domain. Omit it and the surface fits its own, which will not match your axis.
+    priceRange: { from: visiblePriceFrom, to: visiblePriceTo },
   }),
 });
 ```
 
-`getTimeAxis` is called on every render, so it can read live viewport state. Return `null` to fall
-back to the built-in model.
+`getProjection` is called on every render, so it can read live state. Return `null` to fall back to
+the built-in model and an automatic price domain.
 
-Two consequences:
+**All three parts have to agree with your renderer.** Supplying only the time axis is the classic
+mistake: the x positions line up, but the output sits at the wrong height, because our automatic
+price domain is fitted to our idea of the visible bars and yours is fitted to yours. Supplying
+`priceRange` also disables the automatic extents pass — with an explicit domain there is nothing to
+fold in, and your scale is authoritative.
+
+Two consequences of supplying `timeAxis`:
 
 - **Your `visibleTimeRange` decides which bars are visible**, so the automatic price domain fits your
   window rather than ours.
-- **Your `toX`/`toTime` are used verbatim**, and must be exact inverses. TradingView's transform is
+- **Your `toX`/`toTime` are used verbatim.** TradingView's transform is
   `x = width - (rightOffset + barsFromRight(time) + 1) * barSpacing`, where `barsFromRight` counts bar
-  indexes back from the newest bar.
-
-The frame is otherwise unchanged: it still owns the price scale, the plot box and the visible extents.
+  indexes back from the newest bar. Note that its `xToTime` is *not* the inverse of its `timeToX` —
+  the first returns a bar's left edge, the second treats x as a slot centre — so a round trip lands
+  one bar back. Port both verbatim and the overlay keeps matching the candles.
 
 ## Rendering backends
 

@@ -14,6 +14,7 @@ import type {
 } from "@fxtoolkit/indicator-stdlib/abi";
 import { createChartFrame, type PriceScaleMode } from "../model/frame";
 import type {
+  ChartPriceRange,
   ChartRenderFrame,
   ChartRenderPerformanceSnapshot,
   TimeAxis,
@@ -47,14 +48,35 @@ export interface IndicatorEnvironmentOptions {
   timeframeMs?: number;
 }
 
+/**
+ * How the host draws: the box it draws in, its time axis, and optionally its price domain.
+ *
+ * Supplied by a host that owns its own viewport and price scale (a charting library, say) so the
+ * overlay lands exactly on top of whatever it draws. All three have to agree with that renderer —
+ * getting the time axis right but leaving the price domain automatic still misaligns the output,
+ * because the two scales are fitted independently.
+ */
+export interface IndicatorProjection {
+  /** Plot box in CSS pixels, in the coordinate space this surface draws in. */
+  plotHeight: number;
+  plotWidth: number;
+  /**
+   * The host's own price domain. When set, it replaces the automatic one, so the surface draws to
+   * the same scale as the host's price axis.
+   */
+  priceRange?: ChartPriceRange | null;
+  /** Timestamps to x, in the same plot box. */
+  timeAxis: TimeAxis;
+}
+
 export interface IndicatorSurfaceOptions extends IndicatorEnvironmentOptions {
   /**
-   * Supplies the time axis each render, for a host that owns its own viewport (see `TimeAxis`).
+   * Supplies the projection each render, for a host that owns its own viewport and price scale.
    *
-   * Called on every render, so it can read live viewport state from whatever draws the candles.
-   * Return `null` to fall back to the built-in `viewport` model.
+   * Called on every render, so it can read live state from whatever draws the candles. Return `null`
+   * to fall back to the built-in `viewport` model and an automatic price domain.
    */
-  getTimeAxis?: () => TimeAxis | null;
+  getProjection?: () => IndicatorProjection | null;
   /** Render backend. Defaults to `"auto"` (WebGL, falling back to Canvas2D). */
   prefer?: IndicatorRendererPreference;
   /** Overrides device-pixel-ratio detection. */
@@ -92,6 +114,19 @@ export function mountIndicatorSurface(
   const { canvas, container, ownsCanvas } = resolveCanvas(target);
   const { backend, renderer } = createIndicatorRenderer({
     canvas,
+    // A host that supplies a projection owns the box the overlay must fill, so the canvas backing
+    // store follows it rather than the canvas' own client box — otherwise the drawing is scaled into
+    // a box the host is not using.
+    getSize:
+      options.getProjection === undefined
+        ? undefined
+        : () => {
+            const projection = options.getProjection?.() ?? null;
+
+            return projection
+              ? { height: projection.plotHeight, width: projection.plotWidth }
+              : { height: canvas.clientHeight || canvas.height, width: canvas.clientWidth || canvas.width };
+          },
     pixelRatio: options.pixelRatio,
     prefer: options.prefer,
   });
@@ -117,16 +152,18 @@ export function mountIndicatorSurface(
 
   renderer.setBundles(bundles);
 
-  function baseFrameOptions() {
+  function baseFrameOptions(projection: IndicatorProjection | null) {
     return {
       bars,
       dataRevision,
+      freePriceRange: projection?.priceRange ?? undefined,
       pipSize: options.pipSize,
-      plotHeight: canvas.clientHeight || canvas.height,
-      plotWidth: canvas.clientWidth || canvas.width,
-      priceScaleMode: options.priceScaleMode,
+      plotHeight:
+        projection?.plotHeight ?? (canvas.clientHeight || canvas.height),
+      plotWidth: projection?.plotWidth ?? (canvas.clientWidth || canvas.width),
+      priceScaleMode: projection?.priceRange ? "free" : options.priceScaleMode,
       symbol: options.symbol,
-      timeAxis: options.getTimeAxis?.() ?? undefined,
+      timeAxis: projection?.timeAxis,
       timeFrameMs: options.timeframeMs,
       viewport,
     };
@@ -137,18 +174,29 @@ export function mountIndicatorSurface(
       return;
     }
 
+    const projection = options.getProjection?.() ?? null;
+
+    // A host-supplied price domain is authoritative: its scale already covers whatever the host
+    // draws, and a free range wins over extents anyway, so there is nothing to fold in.
+    if (projection?.priceRange) {
+      currentFrame = createChartFrame(baseFrameOptions(projection));
+      renderer.render(currentFrame);
+
+      return;
+    }
+
     // Two passes. An indicator can plot well outside the bar range, and clipping it would make the
     // drawing silently wrong, so its own price range has to be folded into the domain.
     //
     // Extents depend only on the viewport (visible time range and plot size), never on the price
     // domain, so a provisional frame is enough to resolve them — and the adapter's extents cache is
     // keyed on the viewport, so the second pass reuses it rather than recomputing.
-    const provisional = createChartFrame(baseFrameOptions());
+    const provisional = createChartFrame(baseFrameOptions(projection));
     const extents = renderer.getVisiblePriceExtents(provisional);
 
     currentFrame = extents
       ? createChartFrame({
-          ...baseFrameOptions(),
+          ...baseFrameOptions(projection),
           additionalPriceValues: [extents.low, extents.high],
         })
       : provisional;
